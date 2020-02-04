@@ -19,10 +19,13 @@ import (
 	"net"
 	"net/http"
 
+	"contrib.go.opencensus.io/exporter/stackdriver/monitoredresource"
+
+	"contrib.go.opencensus.io/exporter/stackdriver"
+
 	ocprom "contrib.go.opencensus.io/exporter/prometheus"
 	"github.com/prometheus/client_golang/prometheus"
 	"go.opencensus.io/stats/view"
-
 	"istio.io/pkg/log"
 	"istio.io/pkg/version"
 )
@@ -36,6 +39,32 @@ const (
 	metricsPath = "/metrics"
 	versionPath = "/version"
 )
+
+func configureStackdriverExporter() {
+	// check for stackdriver enablement, here just assume we have those names
+	labels := &stackdriver.Labels{}
+	labels.Set("mesh_id", "my-very-big-mesh", "ID for Mesh") // get from env or arg
+	labels.Set("revision", version.Info.String(), "Control plane revision")
+
+	// need to update OC stackdriver libary
+	se, _ := stackdriver.NewExporter(stackdriver.Options{
+		MetricPrefix: "IstioControlPlane",
+		// this is deprecated, but reading the code, it appears to be required
+		// MetricPrefix / GetMetricPrefix seems to be ignored
+		GetMetricType: GetStackDriverMetricType,
+		// SkipCMD:                 true,                           // only works if all reported metrics are known
+		MonitoredResource:       monitoredresource.Autodetect(), // works for GKE, GCE, AWS EC2
+		DefaultMonitoringLabels: labels,
+	})
+
+	// need either this or the view.RegisterExporter call below. This is the
+	// new style.
+	// Ideally, this should be paired with StopMetricsExporter in monitor.Close()
+	se.StartMetricsExporter()
+
+	// in real PR, check err, handle appropriately, also use StartMetricsExport
+	view.RegisterExporter(se)
+}
 
 func addMonitor(mux *http.ServeMux) error {
 	exporter, err := ocprom.NewExporter(ocprom.Options{Registry: prometheus.DefaultRegisterer.(*prometheus.Registry)})
@@ -67,6 +96,8 @@ func startMonitor(addr string, mux *http.ServeMux) (*monitor, error) {
 	if listener, err = net.Listen("tcp", addr); err != nil {
 		return nil, fmt.Errorf("unable to listen on socket: %v", err)
 	}
+
+	configureStackdriverExporter()
 
 	// NOTE: this is a temporary solution to provide bare-bones debug functionality
 	// for pilot. a full design / implementation of self-monitoring and reporting
