@@ -19,10 +19,14 @@ import (
 	"net"
 	"net/http"
 
+	"contrib.go.opencensus.io/exporter/stackdriver/monitoredresource"
+
+	"contrib.go.opencensus.io/exporter/stackdriver"
+	monitoring_sd "istio.io/istio/pilot/pkg/util/monitoring-sd"
+
 	ocprom "contrib.go.opencensus.io/exporter/prometheus"
 	"github.com/prometheus/client_golang/prometheus"
 	"go.opencensus.io/stats/view"
-
 	"istio.io/pkg/log"
 	"istio.io/pkg/version"
 )
@@ -36,6 +40,42 @@ const (
 	metricsPath = "/metrics"
 	versionPath = "/version"
 )
+
+func configureStackdriverExporter() error {
+	// check if we need to enable Stackdriver Exporter or not
+	if !monitoring_sd.UseStackdiverStandardMetrics() {
+		return nil
+	}
+	labels := &stackdriver.Labels{}
+	labels.Set("mesh_id", "my-very-big-mesh", "ID for Mesh")
+	labels.Set("revision", version.Info.String(), "Control plane revision")
+
+	// TODO: (doug) need to update OC stackdriver libary??
+	sd, err := stackdriver.NewExporter(stackdriver.Options{
+		MetricPrefix: "Istio-Control-Plane-Metric",
+		// this is deprecated, but reading the code, it appears to be required
+		// MetricPrefix / GetMetricPrefix seems to be ignored
+		GetMetricType:           monitoring_sd.GetStackDriverMetricType,
+		MonitoredResource:       monitoredresource.Autodetect(), // works for GKE, GCE, AWS EC2
+		DefaultMonitoringLabels: labels,
+	})
+
+	if err != nil {
+		log.Fatalf("Failed to create the Stackdriver exporter: %v", err)
+	}
+
+	// Invoke flush before exits
+	defer sd.Flush()
+
+	// Start stackdriver metrics exporter
+	if err := sd.StartMetricsExporter(); err != nil {
+		log.Errorf("Failed to start Stackdriver metrics exporter: %v", err)
+	}
+	view.RegisterExporter(sd)
+
+	defer sd.StopMetricsExporter()
+	return nil
+}
 
 func addMonitor(mux *http.ServeMux) error {
 	exporter, err := ocprom.NewExporter(ocprom.Options{Registry: prometheus.DefaultRegisterer.(*prometheus.Registry)})
@@ -66,6 +106,10 @@ func startMonitor(addr string, mux *http.ServeMux) (*monitor, error) {
 	var err error
 	if listener, err = net.Listen("tcp", addr); err != nil {
 		return nil, fmt.Errorf("unable to listen on socket: %v", err)
+	}
+
+	if err := configureStackdriverExporter(); err != nil {
+		return nil, fmt.Errorf("unable to register StackDriver exporter: %v", err)
 	}
 
 	// NOTE: this is a temporary solution to provide bare-bones debug functionality

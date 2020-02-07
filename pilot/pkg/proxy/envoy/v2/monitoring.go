@@ -103,6 +103,7 @@ var (
 	cdsBuildErrPushes = pushes.With(typeTag.Value("cds_builderr"))
 	edsPushes         = pushes.With(typeTag.Value("eds"))
 	edsSendErrPushes  = pushes.With(typeTag.Value("eds_senderr"))
+	// TODO: missing edsBuildErrPushes
 	ldsPushes         = pushes.With(typeTag.Value("lds"))
 	ldsSendErrPushes  = pushes.With(typeTag.Value("lds_senderr"))
 	ldsBuildErrPushes = pushes.With(typeTag.Value("lds_builderr"))
@@ -182,6 +183,18 @@ func recordSendError(metric monitoring.Metric, err error) {
 
 func incrementXDSRejects(metric monitoring.Metric, node, errCode string) {
 	metric.With(nodeTag.Value(node), errTag.Value(errCode)).Increment()
+
+	switch metric.Name() {
+	case "pilot_xds_cds_reject":
+		rejectedConfigs.With(typeTag.Value("CDS"), errTag.Value(errCode)).Increment()
+	case "pilot_xds_eds_reject":
+		rejectedConfigs.With(typeTag.Value("EDS"), errTag.Value(errCode)).Increment()
+	case "pilot_xds_lds_reject":
+		rejectedConfigs.With(typeTag.Value("LDS"), errTag.Value(errCode)).Increment()
+	case "pilot_xds_rds_reject":
+		rejectedConfigs.With(typeTag.Value("RDS"), errTag.Value(errCode)).Increment()
+	}
+
 	totalXDSRejects.Increment()
 }
 

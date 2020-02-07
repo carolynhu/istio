@@ -294,4 +294,10 @@ var (
 
 	JwtPolicy = env.RegisterStringVar("JWT_POLICY", jwt.JWTPolicyThirdPartyJWT,
 		"The JWT validation policy.")
+
+	EnableStackdriverMetrics = env.RegisterBoolVar(
+		"PILOT_ENABLE_STACKDRIVER_METRICS",
+		false,
+		"If enabled, Pilot will export Stackdriver metrics.",
+	)
 )
