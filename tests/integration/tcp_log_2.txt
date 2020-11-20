@@ -1,0 +1,55 @@
+2020-11-20T20:43:25.819503Z	info	tf	=== Test Framework Settings ===
+2020-11-20T20:43:25.819557Z	info	tf	TestID:            telemetry_stats_prometheus_tcp
+RunID:             9dfa1cea-68eb-4e91-8bb1-d698f47fa9f7
+NoCleanup:         true
+BaseDir:           /tmp
+Selector:          
+FailOnDeprecation: false
+
+2020-11-20T20:43:25.819562Z	info	tf	===============================
+2020-11-20T20:43:25.819579Z	info	tf	Test run dir: /tmp/telemetry-stats-prometheus-tcp-
+2020-11-20T20:43:25.819609Z	info	tf	Test Framework Kubernetes environment Settings:
+KubeConfig:           [/root/bmctl-workspace/asm7-build71/asm7-build71-kubeconfig]
+MiniKubeIngress:      false
+ControlPlaneTopology: map[0:0]
+NetworkTopology:      map[]
+
+2020-11-20T20:43:25.821759Z	info	tf	=== BEGIN: Setup: 'telemetry_stats_prometheus_tcp' ===
+2020-11-20T20:43:25.821806Z	info	tf	=== BEGIN: Deploy Istio [Suite=telemetry_stats_prometheus_tcp] ===
+2020-11-20T20:43:25.821812Z	info	tf	=== Istio Component Config ===
+2020-11-20T20:43:25.821849Z	info	tf	
+SystemNamespace:                istio-system
+IstioNamespace:                 istio-system
+ConfigNamespace:                istio-system
+TelemetryNamespace:             istio-system
+PolicyNamespace:                istio-system
+IngressNamespace:               istio-system
+EgressNamespace:                istio-system
+DeployIstio:                    true
+DeployTimeout:                  5m0s
+UndeployTimeout:                5m0s
+Values:                         map[global.hub:gcr.io/mixologist-142215/baremetal_asm/ global.imagePullPolicy:Always global.tag:1.7.3]
+IOPFile:                        tests/integration/iop-integration-test-defaults.yaml
+SkipWaitForValidationWebhook:   false
+CustomSidecarInjectorNamespace: 
+
+2020-11-20T20:43:25.821853Z	info	tf	================================
+2020-11-20T20:43:25.822507Z	info	proto: tag has too few fields: "-"
+2020-11-20T20:43:25.829622Z	info	tf	=== FAILED: Deploy Istio [Suite=telemetry_stats_prometheus_tcp] ===
+2020-11-20T20:43:25.829648Z	error	tf	Test setup error: 1 errors occurred deploying control plane clusters: 1 error occurred:
+	* failed deploying control plane to cluster cluster-0: validation errors (use --force to override): 
+invalid value Hub: gcr.io/mixologist-142215/baremetal_asm/
+
+
+2020-11-20T20:43:25.829654Z	info	tf	=== FAILED: Setup: 'telemetry_stats_prometheus_tcp' (1 errors occurred deploying control plane clusters: 1 error occurred:
+	* failed deploying control plane to cluster cluster-0: validation errors (use --force to override): 
+invalid value Hub: gcr.io/mixologist-142215/baremetal_asm/
+
+) ===
+2020-11-20T20:43:25.829658Z	error	tf	Exiting due to setup failure: 1 errors occurred deploying control plane clusters: 1 error occurred:
+	* failed deploying control plane to cluster cluster-0: validation errors (use --force to override): 
+invalid value Hub: gcr.io/mixologist-142215/baremetal_asm/
+
+
+FAIL	istio.io/istio/tests/integration/telemetry/stats/prometheus/tcp	0.117s
+FAIL
