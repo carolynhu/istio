@@ -1,0 +1,71 @@
+2020-11-24T23:01:25.393843Z	info	tf	=== Test Framework Settings ===
+2020-11-24T23:01:25.393915Z	info	tf	TestID:            pilot_cni
+RunID:             222f9b0d-34b5-427a-b049-6f06985d8c6a
+NoCleanup:         true
+BaseDir:           /tmp
+Selector:          
+FailOnDeprecation: false
+
+2020-11-24T23:01:25.393921Z	info	tf	===============================
+2020-11-24T23:01:25.394022Z	info	tf	Test run dir: /tmp/pilot-cni-222f9b0d34b5427ab0496
+2020-11-24T23:01:25.394082Z	info	tf	Test Framework Kubernetes environment Settings:
+KubeConfig:           [/root/bmctl-workspace/asm7-build71/asm7-build71-kubeconfig]
+MiniKubeIngress:      false
+ControlPlaneTopology: map[0:0]
+NetworkTopology:      map[]
+
+2020-11-24T23:01:25.398247Z	info	tf	=== BEGIN: Setup: 'pilot_cni' ===
+2020-11-24T23:01:25.398307Z	info	tf	=== BEGIN: Deploy Istio [Suite=pilot_cni] ===
+2020-11-24T23:01:25.398314Z	info	tf	=== Istio Component Config ===
+2020-11-24T23:01:25.398344Z	info	tf	
+SystemNamespace:                istio-system
+IstioNamespace:                 istio-system
+ConfigNamespace:                istio-system
+TelemetryNamespace:             istio-system
+PolicyNamespace:                istio-system
+IngressNamespace:               istio-system
+EgressNamespace:                istio-system
+DeployIstio:                    true
+DeployTimeout:                  5m0s
+UndeployTimeout:                5m0s
+Values:                         map[global.hub:gcr.io/mixologist-142215/baremetal_asm global.imagePullPolicy:Always global.tag:1.7.3]
+IOPFile:                        tests/integration/iop-integration-test-defaults.yaml
+SkipWaitForValidationWebhook:   false
+CustomSidecarInjectorNamespace: 
+
+2020-11-24T23:01:25.398348Z	info	tf	================================
+2020-11-24T23:01:25.398977Z	info	proto: tag has too few fields: "-"
+2020-11-24T23:01:25.861739Z	info	tf	Running istio control plane on cluster cluster-0 [install --skip-confirmation -f /root/go_projects/src/istio.io/istio/tests/integration/iop-integration-test-defaults.yaml -f /tmp/pilot-cni-222f9b0d34b5427ab0496/_suite_context/istio-deployment-155435516/iop.yaml --set values.global.imagePullPolicy=Always --manifests /root/go_projects/src/istio.io/istio/manifests --set values.global.imagePullPolicy=Always --set values.global.hub=gcr.io/mixologist-142215/baremetal_asm --set values.global.tag=1.7.3]
+
+- Processing resources for Istio core.
+✔ Istio core installed
+- Processing resources for Istiod.
+- Processing resources for Istiod. Waiting for Deployment/istio-system/istiod
+✔ Istiod installed
+- Processing resources for CNI, Ingress gateways.
+- Processing resources for CNI, Ingress gateways. Waiting for Pod/kube-system/istio-cni-node-2fxdf...
+- Processing resources for CNI, Ingress gateways. Waiting for Deployment/istio-system/istio-ingres...
+✔ Ingress gateways installed
+- Processing resources for CNI. Waiting for Pod/kube-system/istio-cni-node-2fxdf, Pod/kube-system/...
+✘ CNI encountered an error: failed to wait for resource: resources not ready after 5m0s: timed out waiting for the condition
+Pod/kube-system/istio-cni-node-2fxdf
+Pod/kube-system/istio-cni-node-4vbn9
+Pod/kube-system/istio-cni-node-gcdjh
+Pod/kube-system/istio-cni-node-lfrkg
+Pod/kube-system/istio-cni-node-mjxmb
+Pod/kube-system/istio-cni-node-tpvtj
+- Pruning removed resources2020-11-24T23:06:36.932634Z	info	tf	=== FAILED: Deploy Istio [Suite=pilot_cni] ===
+2020-11-24T23:06:36.932702Z	error	tf	Test setup error: 1 errors occurred deploying control plane clusters: 1 error occurred:
+	* failed deploying control plane to cluster cluster-0: install failed: failed to install manifests: errors occurred during operation
+
+
+2020-11-24T23:06:36.932708Z	info	tf	=== FAILED: Setup: 'pilot_cni' (1 errors occurred deploying control plane clusters: 1 error occurred:
+	* failed deploying control plane to cluster cluster-0: install failed: failed to install manifests: errors occurred during operation
+
+) ===
+2020-11-24T23:06:36.932714Z	error	tf	Exiting due to setup failure: 1 errors occurred deploying control plane clusters: 1 error occurred:
+	* failed deploying control plane to cluster cluster-0: install failed: failed to install manifests: errors occurred during operation
+
+
+FAIL	istio.io/istio/tests/integration/pilot/cni	311.653s
+FAIL
