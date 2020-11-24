@@ -1,0 +1,1 @@
+ok  	istio.io/istio/tests/integration/security/ca_custom_root	94.034s
