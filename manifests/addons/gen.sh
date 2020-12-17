@@ -66,6 +66,7 @@ function compressDashboard() {
   compressDashboard "istio-service-dashboard.json"
   compressDashboard "istio-mesh-dashboard.json"
   compressDashboard "istio-extension-dashboard.json"
+  compressDashboard "istio-canonical-service-dashboard.json"
   echo -e "\n---\n"
   kubectl create configmap -n istio-system istio-grafana-dashboards \
     --dry-run=client -oyaml \
@@ -79,4 +80,9 @@ function compressDashboard() {
     --from-file=istio-service-dashboard.json="${TMP}/istio-service-dashboard.json" \
     --from-file=istio-mesh-dashboard.json="${TMP}/istio-mesh-dashboard.json" \
     --from-file=istio-extension-dashboard.json="${TMP}/istio-extension-dashboard.json"
+
+  echo -e "\n---\n"
+  kubectl create configmap -n istio-system istio-canonical-services-grafana-dashboards \
+    --dry-run=client -oyaml \
+    --from-file=istio-canonical-service-dashboard.json="/Users/carolynprh/go_project/src/istio.io/istio/manifests/addons/dashboards/istio-canonical-service-dashboard.json"
 } > "${ADDONS}/grafana.yaml"

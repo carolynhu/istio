@@ -84,6 +84,7 @@ dashboards:
   istio-workload-dashboard: 7630
   pilot-dashboard: 7645
   istio-extension-dashboard: 13277
+  istio-canonical-service-dashboard: 7646
 ${PROXY_OVERRIDE:-}
 EOF
 )
