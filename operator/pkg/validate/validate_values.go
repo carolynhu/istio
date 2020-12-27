@@ -15,6 +15,8 @@
 package validate
 
 import (
+	"fmt"
+
 	"github.com/ghodss/yaml"
 
 	"istio.io/istio/operator/pkg/apis/istio/v1alpha1"
@@ -42,6 +44,21 @@ func CheckValues(root interface{}) util.Errors {
 	if err := util.UnmarshalWithJSONPB(string(vs), val, false); err != nil {
 		return util.Errors{err}
 	}
+	if val.Global.DefaultPodDisruptionBudget.Enabled.Value && val.Pilot.AutoscaleEnabled.Value {
+		// 2 derived from: the default PDB minAvaliable 1 plus 1
+		if val.Pilot.AutoscaleMin < 2 || val.Pilot.ReplicaCount < 2 {
+			return util.NewErrs(fmt.Errorf("Istiod HorizontalPodAutoscaler MinReplica is violating PDB minAvailable 1."))
+
+		}
+	}
+	if val.Global.DefaultPodDisruptionBudget.Enabled.Value && val.Gateways.IstioIngressgateway.AutoscaleEnabled.Value {
+		if val.Gateways.IstioIngressgateway.AutoscaleMin < 2 {
+			return util.NewErrs(fmt.Errorf("IstioIngressgateway HorizontalPodAutoscaler MinReplica is violating PDB minAvailable 1."))
+
+		}
+	}
+	// similar for IstioEgressgateway
+
 	return ValuesValidate(DefaultValuesValidations, root, nil)
 }
 
