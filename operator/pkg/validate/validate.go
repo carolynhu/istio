@@ -35,6 +35,9 @@ var (
 		"Values": func(path util.Path, i interface{}) util.Errors {
 			return CheckValues(i)
 		},
+		"Components": func(path util.Path, i interface{}) util.Errors {
+			return CheckComponents(i)
+		},
 		"MeshConfig":                         validateMeshConfig,
 		"Hub":                                validateHub,
 		"Tag":                                validateTag,
