@@ -22,6 +22,8 @@ import (
 	"strings"
 	"time"
 
+	"istio.io/istio/pilot/pkg/networking/plugin/metadataexchange"
+
 	accesslog "github.com/envoyproxy/go-control-plane/envoy/config/accesslog/v3"
 	core "github.com/envoyproxy/go-control-plane/envoy/config/core/v3"
 	listener "github.com/envoyproxy/go-control-plane/envoy/config/listener/v3"
@@ -238,6 +240,10 @@ func init() {
 func (configgen *ConfigGeneratorImpl) BuildListeners(node *model.Proxy,
 	push *model.PushContext) []*listener.Listener {
 	builder := NewListenerBuilder(node, push)
+
+	if util.IsIstioVersionGE19(node) {
+		configgen.Plugins = append(configgen.Plugins, metadataexchange.NewPlugin())
+	}
 
 	switch node.Type {
 	case model.SidecarProxy:
